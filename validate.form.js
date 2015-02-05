@@ -1,5 +1,5 @@
 /**
- * Created by lemanzhang on 2/4/2015.
+ * Created by Kaidong on 2/4/2015.
  */
 define(function(require, exports, module){
     var $ = require('jquery');
