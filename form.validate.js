@@ -1,8 +1,22 @@
 /**
- * Created by Kaidong on 2/4/2015.
+ * Created by lemanzhang on 2/4/2015.
  */
 define(function(require, exports, module){
-    var $ = require('jquery');
+    exports.predefinedRules = {
+        email: '^[a-z]([a-z0-9]*[-_]?[a-z0-9]+)*@([a-z0-9]*[-_]?[a-z0-9]+)+[\.][a-z]{2,3}([\.][a-z]{2})?$',
+        china: {
+            id: '^\d{15}$)|(^\d{17}([0-9]|X)$',
+            mobile: '^(1)\d{10}$',
+            zipcode: '[1-9]{1}(\d+){5}'
+        }
+    };
+    
+    exports.getFieldsFromValidateConfig = function(validateConfig, fieldName){
+
+    };
+});
+
+(function(){
     var common = {
         isInteger: function(value){
             return parseInt(value)==value;
@@ -12,11 +26,14 @@ define(function(require, exports, module){
     var mod = {
         validate: function(form, obj, callback){
             if(typeof obj == 'undefined' ||
-                typeof obj.rules == 'undefined')
+                typeof obj.rules == 'undefined'){
+                throw "function of form.validate cannot be called with undefined parameter.\nobj or obj.rules cannot be undefined."
                 return;
+            }
+
 
             var rules = obj.rules;
-            var message = obj.message;
+            var messages = obj.messages;
             var result = {};
 
             $(rules).each(function(index, element) {
@@ -33,11 +50,11 @@ define(function(require, exports, module){
                             input.val().length == 0)
                         {
                             var errorMessage = 'unspecified error message.';
-                            if(typeof message == 'object' &&
-                                typeof message[property] == 'object' &&
-                                typeof message[property].required == 'string')
+                            if(typeof messages == 'object' &&
+                                typeof messages[property] == 'object' &&
+                                typeof messages[property].required == 'string')
                             {
-                                errorMessage = message[property].required;
+                                errorMessage = messages[property].required;
                             }
                             if(typeof result[property] == 'undefined')
                             {
@@ -52,11 +69,11 @@ define(function(require, exports, module){
                             input.val().length > element[property].maxlength)
                         {
                             var errorMessage = 'unspecified error message.';
-                            if(typeof message == 'object' &&
-                                typeof message[property] == 'object' &&
-                                typeof message[property].maxlength == 'string')
+                            if(typeof messages == 'object' &&
+                                typeof messages[property] == 'object' &&
+                                typeof messages[property].maxlength == 'string')
                             {
-                                errorMessage = message[property].maxlength;
+                                errorMessage = messages[property].maxlength;
                             }
                             if(typeof result[property] == 'undefined')
                             {
@@ -71,11 +88,11 @@ define(function(require, exports, module){
                             input.val().length < element[property].minlength)
                         {
                             var errorMessage = 'unspecified error message.';
-                            if(typeof message == 'object' &&
-                                typeof message[property] == 'object' &&
-                                typeof message[property].minlength == 'string')
+                            if(typeof messages == 'object' &&
+                                typeof messages[property] == 'object' &&
+                                typeof messages[property].minlength == 'string')
                             {
-                                errorMessage = message[property].minlength;
+                                errorMessage = messages[property].minlength;
                             }
                             if(typeof result[property] == 'undefined')
                             {
@@ -88,11 +105,11 @@ define(function(require, exports, module){
                             !new RegExp(element[property].customExpression, "g").test(input.val()))
                         {
                             var errorMessage = 'unspecified error message.';
-                            if(typeof message == 'object' &&
-                                typeof message[property] == 'object' &&
-                                typeof message[property].customExpression == 'string')
+                            if(typeof messages == 'object' &&
+                                typeof messages[property] == 'object' &&
+                                typeof messages[property].customExpression == 'string')
                             {
-                                errorMessage = message[property].customExpression;
+                                errorMessage = messages[property].customExpression;
                             }
                             if(typeof result[property] == 'undefined')
                             {
@@ -114,11 +131,11 @@ define(function(require, exports, module){
                             checkedLength == 0)
                         {
                             var errorMessage = 'unspecified error message.';
-                            if(typeof message == 'object' &&
-                                typeof message[property] == 'object' &&
-                                typeof message[property].required == 'string')
+                            if(typeof messages == 'object' &&
+                                typeof messages[property] == 'object' &&
+                                typeof messages[property].required == 'string')
                             {
-                                errorMessage = message[property].required;
+                                errorMessage = messages[property].required;
                             }
                             if(typeof result[property] == 'undefined')
                             {
@@ -133,11 +150,11 @@ define(function(require, exports, module){
                             checkedLength > element[property].maxlength)
                         {
                             var errorMessage = 'unspecified error message.';
-                            if(typeof message == 'object' &&
-                                typeof message[property] == 'object' &&
-                                typeof message[property].maxlength == 'string')
+                            if(typeof messages == 'object' &&
+                                typeof messages[property] == 'object' &&
+                                typeof messages[property].maxlength == 'string')
                             {
-                                errorMessage = message[property].maxlength;
+                                errorMessage = messages[property].maxlength;
                             }
                             if(typeof result[property] == 'undefined')
                             {
@@ -152,11 +169,11 @@ define(function(require, exports, module){
                             checkedLength < element[property].minlength)
                         {
                             var errorMessage = 'unspecified error message.';
-                            if(typeof message == 'object' &&
-                                typeof message[property] == 'object' &&
-                                typeof message[property].minlength == 'string')
+                            if(typeof messages == 'object' &&
+                                typeof messages[property] == 'object' &&
+                                typeof messages[property].minlength == 'string')
                             {
-                                errorMessage = message[property].minlength;
+                                errorMessage = messages[property].minlength;
                             }
                             if(typeof result[property] == 'undefined')
                             {
@@ -169,11 +186,11 @@ define(function(require, exports, module){
                             !new RegExp(element[property].customExpression, "g").test(check.val()))
                         {
                             var errorMessage = 'unspecified error message.';
-                            if(typeof message == 'object' &&
-                                typeof message[property] == 'object' &&
-                                typeof message[property].customExpression == 'string')
+                            if(typeof messages == 'object' &&
+                                typeof messages[property] == 'object' &&
+                                typeof messages[property].customExpression == 'string')
                             {
-                                errorMessage = message[property].customExpression;
+                                errorMessage = messages[property].customExpression;
                             }
                             if(typeof result[property] == 'undefined')
                             {
@@ -199,11 +216,11 @@ define(function(require, exports, module){
                             radioSelectedIndex == -1)
                         {
                             var errorMessage = 'unspecified error message.';
-                            if(typeof message == 'object' &&
-                                typeof message[property] == 'object' &&
-                                typeof message[property].required == 'string')
+                            if(typeof messages == 'object' &&
+                                typeof messages[property] == 'object' &&
+                                typeof messages[property].required == 'string')
                             {
-                                errorMessage = message[property].required;
+                                errorMessage = messages[property].required;
                             }
                             if(typeof result[property] == 'undefined')
                             {
@@ -218,11 +235,11 @@ define(function(require, exports, module){
                             radioSelectedIndex > element[property].maxindex)
                         {
                             var errorMessage = 'unspecified error message.';
-                            if(typeof message == 'object' &&
-                                typeof message[property] == 'object' &&
-                                typeof message[property].maxindex == 'string')
+                            if(typeof messages == 'object' &&
+                                typeof messages[property] == 'object' &&
+                                typeof messages[property].maxindex == 'string')
                             {
-                                errorMessage = message[property].maxindex;
+                                errorMessage = messages[property].maxindex;
                             }
                             if(typeof result[property] == 'undefined')
                             {
@@ -237,11 +254,11 @@ define(function(require, exports, module){
                             radioSelectedIndex < element[property].minindex)
                         {
                             var errorMessage = 'unspecified error message.';
-                            if(typeof message == 'object' &&
-                                typeof message[property] == 'object' &&
-                                typeof message[property].minindex == 'string')
+                            if(typeof messages == 'object' &&
+                                typeof messages[property] == 'object' &&
+                                typeof messages[property].minindex == 'string')
                             {
-                                errorMessage = message[property].minindex;
+                                errorMessage = messages[property].minindex;
                             }
                             if(typeof result[property] == 'undefined')
                             {
@@ -254,11 +271,11 @@ define(function(require, exports, module){
                             !new RegExp(element[property].customExpression, "g").test(radio.val()))
                         {
                             var errorMessage = 'unspecified error message.';
-                            if(typeof message == 'object' &&
-                                typeof message[property] == 'object' &&
-                                typeof message[property].customExpression == 'string')
+                            if(typeof messages == 'object' &&
+                                typeof messages[property] == 'object' &&
+                                typeof messages[property].customExpression == 'string')
                             {
-                                errorMessage = message[property].customExpression;
+                                errorMessage = messages[property].customExpression;
                             }
                             if(typeof result[property] == 'undefined')
                             {
@@ -278,11 +295,11 @@ define(function(require, exports, module){
                             selectedIndex > element[property].maxindex)
                         {
                             var errorMessage = 'unspecified error message.';
-                            if(typeof message == 'object' &&
-                                typeof message[property] == 'object' &&
-                                typeof message[property].maxindex == 'string')
+                            if(typeof messages == 'object' &&
+                                typeof messages[property] == 'object' &&
+                                typeof messages[property].maxindex == 'string')
                             {
-                                errorMessage = message[property].maxindex;
+                                errorMessage = messages[property].maxindex;
                             }
                             if(typeof result[property] == 'undefined')
                             {
@@ -297,11 +314,11 @@ define(function(require, exports, module){
                             selectedIndex < element[property].minindex)
                         {
                             var errorMessage = 'unspecified error message.';
-                            if(typeof message == 'object' &&
-                                typeof message[property] == 'object' &&
-                                typeof message[property].minindex == 'string')
+                            if(typeof messages == 'object' &&
+                                typeof messages[property] == 'object' &&
+                                typeof messages[property].minindex == 'string')
                             {
-                                errorMessage = message[property].minindex;
+                                errorMessage = messages[property].minindex;
                             }
                             if(typeof result[property] == 'undefined')
                             {
@@ -314,11 +331,11 @@ define(function(require, exports, module){
                             !new RegExp(element[property].customExpression, "g").test(select.val()))
                         {
                             var errorMessage = 'unspecified error message.';
-                            if(typeof message == 'object' &&
-                                typeof message[property] == 'object' &&
-                                typeof message[property].customExpression == 'string')
+                            if(typeof messages == 'object' &&
+                                typeof messages[property] == 'object' &&
+                                typeof messages[property].customExpression == 'string')
                             {
-                                errorMessage = message[property].customExpression;
+                                errorMessage = messages[property].customExpression;
                             }
                             if(typeof result[property] == 'undefined')
                             {
@@ -329,7 +346,6 @@ define(function(require, exports, module){
                     }
                 }
             });
-
             // 如果通过校验，执行success并返回表单数据对象
             // 如果未通过校验，执行fail并返回错误message
             if(Object.getOwnPropertyNames(result).length > 0) {
@@ -347,6 +363,7 @@ define(function(require, exports, module){
                         data[key] = $(element).val();
                     });
                     obj.success(data);
+                    return true;
                 }
             }
 
@@ -354,15 +371,7 @@ define(function(require, exports, module){
             if(typeof callback == 'function'){
                 callback(result);
             }
-        }
-    };
-
-    exports.predefinedRules = {
-        email: '^[a-z]([a-z0-9]*[-_]?[a-z0-9]+)*@([a-z0-9]*[-_]?[a-z0-9]+)+[\.][a-z]{2,3}([\.][a-z]{2})?$',
-        china: {
-            id: '^\d{15}$)|(^\d{17}([0-9]|X)$',
-            mobile: '^(1)\d{10}$',
-            zipcode: '[1-9]{1}(\d+){5}'
+            return false;
         }
     };
 
@@ -371,4 +380,4 @@ define(function(require, exports, module){
             mod.validate(this, obj, callback);
         }
     });
-});
+})();
