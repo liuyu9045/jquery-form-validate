@@ -5,10 +5,10 @@ define(function(require, exports, module){
     exports.predefinedRules = {
         email: '^[a-z]([a-z0-9]*[-_]?[a-z0-9]+)*@([a-z0-9]*[-_]?[a-z0-9]+)+[\.][a-z]{2,3}([\.][a-z]{2})?$',
         china: {
-            id: '^\d{15}$)|(^\d{17}([0-9]|X)$',
-            mobile: '^(1)\d{10}$',
-            zipcode: '^[1-9]{1}(\d+){5}$',
-            telphone: '^\d{3,4}-\d{7,8}(-\d{1,5})?$'
+            id: '^\\d{15}$)|(^\\d{17}([0-9]|X)$',
+            mobile: '^1\\d{10}$',
+            zipcode: '^[1-9]\\d{5}$',
+            telphone: '^\\d{3,4}-\\d{7,8}(-\\d{1,5})?$'
         }
     };
 
@@ -66,11 +66,10 @@ define(function(require, exports, module){
                 // property即对应指定表单元素的name
                 for(var property in element)
                 {
+                    var allowEmpty = true;
                     // 查找可以输入文字的对象，排除checkbox和radio
                     var input = $('input[type!="checkbox"][type!="radio"][name="'+property+'"],textarea[name="'+property+'"]', form);
                     if(input.length > 0){
-
-                        var allowEmpty = true;
                         // 检查必填项
                         if(typeof element[property].required == 'boolean' &&
                             element[property].required &&
@@ -131,7 +130,7 @@ define(function(require, exports, module){
                         }
                         // 检查自定义正则表达式字符(注意，如果该字段未设置required或者required值为false，则允许跳过正则表达式检测)
                         if(typeof element[property].customExpression == 'string' &&
-                            !allowEmpty &&
+                            (!allowEmpty || input.val().length > 0) &&
                             !new RegExp(element[property].customExpression, "g").test(input.val()))
                         {
                             var errorMessage = 'unspecified error message.';
@@ -160,6 +159,7 @@ define(function(require, exports, module){
                             element[property].required &&
                             checkedLength == 0)
                         {
+                            allowEmpty = false;
                             var errorMessage = 'unspecified error message.';
                             if(typeof messages == 'object' &&
                                 typeof messages[property] == 'object' &&
@@ -213,6 +213,7 @@ define(function(require, exports, module){
                         }
                         // 检查自定义正则表达式字符
                         if(typeof element[property].customExpression == 'string' &&
+                            (!allowEmpty || check.val().length > 0) &&
                             !new RegExp(element[property].customExpression, "g").test(check.val()))
                         {
                             var errorMessage = 'unspecified error message.';
@@ -245,6 +246,7 @@ define(function(require, exports, module){
                             element[property].required &&
                             radioSelectedIndex == -1)
                         {
+                            allowEmpty = false;
                             var errorMessage = 'unspecified error message.';
                             if(typeof messages == 'object' &&
                                 typeof messages[property] == 'object' &&
@@ -298,6 +300,7 @@ define(function(require, exports, module){
                         }
                         // 检查自定义正则表达式字符
                         if(typeof element[property].customExpression == 'string' &&
+                            (!allowEmpty || radio.val().length > 0) &&
                             !new RegExp(element[property].customExpression, "g").test(radio.val()))
                         {
                             var errorMessage = 'unspecified error message.';
@@ -324,6 +327,7 @@ define(function(require, exports, module){
                             common.isInteger(element[property].maxindex) &&
                             selectedIndex > element[property].maxindex)
                         {
+                            allowEmpty = false;
                             var errorMessage = 'unspecified error message.';
                             if(typeof messages == 'object' &&
                                 typeof messages[property] == 'object' &&
@@ -358,6 +362,7 @@ define(function(require, exports, module){
                         }
                         // 检查自定义正则表达式字符
                         if(typeof element[property].customExpression == 'string' &&
+                            (!allowEmpty || select.val().length > 0) &&
                             !new RegExp(element[property].customExpression, "g").test(select.val()))
                         {
                             var errorMessage = 'unspecified error message.';
