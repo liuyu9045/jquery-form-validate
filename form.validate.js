@@ -7,12 +7,37 @@ define(function(require, exports, module){
         china: {
             id: '^\d{15}$)|(^\d{17}([0-9]|X)$',
             mobile: '^(1)\d{10}$',
-            zipcode: '[1-9]{1}(\d+){5}'
+            zipcode: '^[1-9]{1}(\d+){5}$',
+            telphone: '^\d{3,4}-\d{7,8}(-\d{1,5})?$'
         }
     };
-    
-    exports.getFieldsFromValidateConfig = function(validateConfig, fieldName){
 
+    exports.getFieldsFromValidateConfig = function(validateConfig, fieldName){
+        var config = {
+            rules: {}
+        };
+        if(typeof validateConfig != 'undefined' &&
+            typeof validateConfig.rules != 'undefined' &&
+            typeof validateConfig.rules[fieldName] != 'undefined' &&
+            typeof fieldName != 'undefined'){
+            config['rules'] = {};
+            config['rules'][fieldName] = validateConfig.rules[fieldName];
+            if(typeof validateConfig.messages != 'undefined' &&
+                typeof validateConfig.messages[fieldName] != 'undefined'){
+                config['messages'] = {};
+                config['messages'][fieldName] = validateConfig.messages[fieldName];
+            }
+            if(typeof validateConfig.success == 'function'){
+                config.success = validateConfig.success;
+            }
+            if(typeof validateConfig.fail == 'function'){
+                config.fail = validateConfig.fail;
+            }
+            if(typeof validateConfig.customValidate == 'function'){
+                config.customValidate = validateConfig.customValidate();
+            }
+        }
+        return config;
     };
 });
 
@@ -44,11 +69,14 @@ define(function(require, exports, module){
                     // 查找可以输入文字的对象，排除checkbox和radio
                     var input = $('input[type!="checkbox"][type!="radio"][name="'+property+'"],textarea[name="'+property+'"]', form);
                     if(input.length > 0){
+
+                        var allowEmpty = true;
                         // 检查必填项
                         if(typeof element[property].required == 'boolean' &&
                             element[property].required &&
                             input.val().length == 0)
                         {
+                            allowEmpty = false;
                             var errorMessage = 'unspecified error message.';
                             if(typeof messages == 'object' &&
                                 typeof messages[property] == 'object' &&
@@ -62,6 +90,7 @@ define(function(require, exports, module){
                             }
                             result[property].required = errorMessage;
                         }
+
                         // 检查字符最大长度
                         if(typeof element[property].maxlength == 'number' &&
                             element[property].maxlength > 0 &&
@@ -100,8 +129,9 @@ define(function(require, exports, module){
                             }
                             result[property].minlength = errorMessage;
                         }
-                        // 检查自定义正则表达式字符
+                        // 检查自定义正则表达式字符(注意，如果该字段未设置required或者required值为false，则允许跳过正则表达式检测)
                         if(typeof element[property].customExpression == 'string' &&
+                            !allowEmpty &&
                             !new RegExp(element[property].customExpression, "g").test(input.val()))
                         {
                             var errorMessage = 'unspecified error message.';
@@ -346,22 +376,37 @@ define(function(require, exports, module){
                     }
                 }
             });
+
+            var data = {};
+            if(typeof obj.success == 'function' ||
+                typeof obj.customValidate == 'function'){
+                $('input,textarea,select', form).each(function(index, element){
+                    var key = $(element).attr('name');
+                    if(typeof key != 'string' || key.length == 0)
+                        return;
+
+                    data[key] = $(element).val();
+                });
+            }
+
+            var customValidateResult = true;
+            // 执行自定义校验
+            if(typeof obj.customValidate == 'function'){
+                customValidateResult = obj.customValidate(data);
+                if(typeof customValidateResult != 'boolean'){
+                    customValidateResult = true;
+                }
+            }
+
             // 如果通过校验，执行success并返回表单数据对象
             // 如果未通过校验，执行fail并返回错误message
-            if(Object.getOwnPropertyNames(result).length > 0) {
+            if(Object.getOwnPropertyNames(result).length > 0 &&
+                customValidateResult) {
                 if(typeof obj.fail == 'function'){
                     obj.fail(result);
                 }
             }else{
                 if(typeof obj.success == 'function'){
-                    var data = {};
-                    $('input,textarea,select', form).each(function(index, element){
-                        var key = $(element).attr('name');
-                        if(typeof key != 'string' || key.length == 0)
-                            return;
-
-                        data[key] = $(element).val();
-                    });
                     obj.success(data);
                     return true;
                 }
