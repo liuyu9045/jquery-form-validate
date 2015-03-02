@@ -397,9 +397,13 @@ define(function(require, exports, module){
             var customValidateResult = true;
             // 执行自定义校验
             if(typeof obj.customValidate == 'function'){
-                customValidateResult = obj.customValidate(data);
-                if(typeof customValidateResult != 'boolean'){
-                    customValidateResult = true;
+                var cvr = obj.customValidate(data);
+                if(typeof cvr != 'object' &&
+                    typeof cvr.result == 'boolean'){
+                    customValidateResult = cvr.result;
+                    if(typeof cvr.message == 'string'){
+                        result['CustomValidateMessage'] = cvr.message;
+                    }
                 }
             }
 
