@@ -3,7 +3,7 @@
  */
 define(function(require, exports, module){
     exports.predefinedRules = {
-        email: '^[a-z]([a-z0-9]*[-_]?[a-z0-9]+)*@([a-z0-9]*[-_]?[a-z0-9]+)+[\.][a-z]{2,3}([\.][a-z]{2})?$',
+        email: '^[a-z0-9]([a-z0-9]*[-_]?[a-z0-9]+)*@([a-z0-9]*[-_]?[a-z0-9]+)+[\.][a-z]{2,3}([\.][a-z]{2})?$',
         china: {
             id: '^\\d{15}$)|(^\\d{17}([0-9]|X)$',
             mobile: '^1\\d{10}$',
